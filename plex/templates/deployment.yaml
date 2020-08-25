@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    spec:
+      containers:
+      - name: plex
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        readinessProbe:
+          httpGet:
+            path: /identity
+            port: 32400
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /identity
+            port: 32400
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        ports:
+          - name: pms
+            containerPort: 32400
+          - name: http
+            containerPort: 32400
+          - name: https
+            containerPort: 32443
+        env:
+        - name: TZ
+          value: "{{ .Values.timezone }}"
+        # TODO: move this to a secret?
+        - name: PLEX_CLAIM
+          value: "{{ .Values.claimToken }}"
+        # kube-plex env vars
+        - name: PMS_INTERNAL_ADDRESS
+          value: http://{{ .Values.name }}:32400
+        - name: PMS_IMAGE
+          value: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: KUBE_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: media
+          mountPath: /
+      volumes:
+      - name: config
+        emptyDir: {}
+      - name: media
+        hostPath:
+          path: {{ .Values.media.path }}
