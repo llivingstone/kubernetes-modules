@@ -12,6 +12,20 @@ spec:
         app.kubernetes.io/name: {{ .Values.name }}
     spec:
       terminationGracePeriodSeconds: 120
+      initContainers:
+      - name: {{ .Values.name }}-config
+        image: busybox:latest
+        command:
+          - cp
+        args:
+          - -v
+          - /in/rclone.conf
+          - /out/rclone.conf
+        volumeMounts:
+        - name: config-data
+          mountPath: /in
+        - name: config
+          mountPath: /out
       containers:
       - name: {{ .Values.name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -49,6 +63,8 @@ spec:
           mountPropagation: Bidirectional
       volumes:
       - name: config
+        emptyDir: {}
+      - name: config-data
         secret:
           secretName: {{ .Values.rclone.secretname }}
       - name: media

@@ -9,8 +9,8 @@ image:
 
 rclone:
   secretname: rclone-secret
-  remote: "gcache:"
-  path: /mnt/disks/gdrive
+  remote: "gcrypt:/"
+  path: /home/pi/gdrive
   readOnly: true
   additionalArgs:
     - --log-level=INFO
