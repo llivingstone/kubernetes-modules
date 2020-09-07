@@ -11,6 +11,9 @@ spec:
     matchLabels:
       app: {{ .Values.name }}
   template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
     spec:
       containers:
       - name: plex
