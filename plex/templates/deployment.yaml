@@ -38,14 +38,8 @@ spec:
         env:
         - name: TZ
           value: "{{ .Values.timezone }}"
-        # TODO: move this to a secret?
         - name: PLEX_CLAIM
           value: "{{ .Values.claimToken }}"
-        # kube-plex env vars
-        - name: PMS_INTERNAL_ADDRESS
-          value: http://{{ .Values.name }}:32400
-        - name: PMS_IMAGE
-          value: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         - name: KUBE_NAMESPACE
           valueFrom:
             fieldRef:
@@ -54,10 +48,11 @@ spec:
         - name: config
           mountPath: /config
         - name: media
-          mountPath: /
+          mountPath: /media
       volumes:
       - name: config
-        emptyDir: {}
+        hostPath:
+          path: {{ .Values.paths.config }}
       - name: media
         hostPath:
-          path: {{ .Values.media.path }}
+          path: {{ .Values.paths.media }}

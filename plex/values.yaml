@@ -2,10 +2,11 @@ name: plex
 
 image:
   repository: linuxserver/plex
-  tag: arm32v7-latest
+  tag: latest
 
 timezone: Europe/London
 claimToken:
 
-media:
-  path: /home/pi/gdrive
+paths:
+  media:
+  config:

@@ -9,7 +9,7 @@ spec:
       port: 32400
       protocol: TCP
       targetPort: pms
-      nodePort: 3400
+      nodePort: 32400
     - name: http
       port: 80
       targetPort: pms
